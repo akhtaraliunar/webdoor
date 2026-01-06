@@ -1,0 +1,889 @@
+/* RESET & BASE */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+.custom-player-container { 
+    background: #000; 
+    font-family: Arial, sans-serif; 
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+    .custom-player-container {
+        padding-bottom: 63.25%; /* 7% extra height for mobile portrait */
+    }
+}
+
+#customVideo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.big-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    background: rgba(229, 9, 20, 0.9);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 26px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.3s;
+}
+
+.bottom-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    padding: 15px 20px;
+    z-index: 100;
+    transition: opacity 0.3s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.progress-container {
+    margin-bottom: 15px;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #e50914;
+    border-radius: 3px;
+    width: 0%;
+    position: relative;
+    transition: width 0.1s linear;
+}
+
+.progress-knob {
+    position: absolute;
+    top: 50%;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    background: #e50914;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    z-index: 101;
+    transition: all 0.1s;
+    display: block !important;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+}
+
+.buffer-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    width: 0%;
+    z-index: 0;
+}
+
+.controls-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.left-controls, .right-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.control-btn, .speed-btn, .quality-btn, .fullscreen-btn, .download-btn, .audio-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 40px;
+    user-select: none;
+}
+
+.control-btn:active, .speed-btn:active, .quality-btn:active, .fullscreen-btn:active, .download-btn:active, .audio-btn:active,
+.control-btn:focus, .speed-btn:focus, .quality-btn:focus, .fullscreen-btn:focus, .download-btn:focus, .audio-btn:focus {
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+}
+
+.control-btn.disabled, .speed-btn.disabled, .quality-btn.disabled, .fullscreen-btn.disabled, .download-btn.disabled, .audio-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Audio button special styling - TOP RIGHT POSITION */
+.audio-btn {
+    background: rgba(59, 130, 246, 0.8);
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 99;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    transition: opacity 0.3s;
+}
+
+.audio-btn:hover {
+    background: rgba(59, 130, 246, 1);
+}
+
+/* Download button special styling */
+.download-btn {
+    background: rgba(76, 175, 80, 0.8);
+}
+
+.download-btn:hover {
+    background: rgba(76, 175, 80, 1);
+}
+
+/* Speed button styling */
+.speed-btn {
+    background: rgba(255, 165, 0, 0.8);
+}
+
+.speed-btn:hover {
+    background: rgba(255, 165, 0, 1);
+}
+
+.volume-control, .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.download-control, .quality-control, .speed-control { 
+    position: relative; 
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Dropdowns - Glass Style */
+.audio-dropdown, .download-dropdown, .quality-dropdown, .speed-dropdown {
+    position: absolute;
+    background: rgba(20, 20, 20, 0.98);
+    border-radius: 12px;
+    padding: 8px 0;
+    min-width: 150px;
+    max-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    z-index: 101;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    animation: dropdownSlideDown 0.2s ease-out;
+}
+
+.audio-dropdown { 
+    top: 60px;
+    right: 15px;
+}
+
+.quality-dropdown, .speed-dropdown, .download-dropdown { 
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 5px;
+}
+
+.audio-dropdown::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 20px;
+    width: 16px;
+    height: 16px;
+    background: rgba(20, 20, 20, 0.98);
+    transform: rotate(-135deg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quality-dropdown::before,
+.speed-dropdown::before,
+.download-dropdown::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 20px;
+    width: 16px;
+    height: 16px;
+    background: rgba(20, 20, 20, 0.98);
+    transform: rotate(45deg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.audio-dropdown.show,
+.quality-dropdown.show,
+.speed-dropdown.show,
+.download-dropdown.show {
+    display: block;
+}
+
+@keyframes dropdownSlideDown {
+    from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.audio-option,
+.download-option,
+.quality-option,
+.speed-option {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+}
+@media (max-width: 768px) {
+
+    /* Buttons smaller */
+    .audio-btn {
+        top: 10px;
+        right: 10px;
+        padding: 6px 8px;
+    }
+
+    /* Dropdown size smaller */
+    .audio-dropdown,
+    .download-dropdown,
+    .quality-dropdown,
+    .speed-dropdown {
+        min-width: 120px;
+        max-width: 160px;
+        border-radius: 10px;
+        padding: 6px 0;
+        max-height: 220px;
+    }
+
+    /* Dropdown arrows smaller */
+    .audio-dropdown::before {
+        width: 10px;
+        height: 10px;
+        right: 12px;
+    }
+
+    .quality-dropdown::before,
+    .speed-dropdown::before,
+    .download-dropdown::before {
+        width: 10px;
+        height: 10px;
+        bottom: -5px;
+        right: 12px;
+    }
+
+    /* Options compact */
+    .audio-option,
+    .download-option,
+    .quality-option,
+    .speed-option {
+        padding: 8px 12px;
+        font-size: 12px;
+        gap: 6px;
+    }
+
+    .audio-option.active::before,
+    .quality-option.active::before,
+    .speed-option.active::before {
+        right: 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* SPEED dropdown center align with button */
+    .speed-control {
+        position: relative;
+    }
+
+    .speed-dropdown {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        transform-origin: bottom center;
+    }
+
+    .speed-dropdown::before {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) rotate(45deg);
+    }
+}
+
+
+
+
+
+.download-option.disabled, .quality-option.disabled, .speed-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.download-option.disabled:hover, .quality-option.disabled:hover, .speed-option.disabled:hover {
+    background: none;
+    color: rgba(255, 255, 255, 0.5);
+    padding-left: 16px;
+}
+
+.player-container.idle .bottom-controls {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+.player-container.idle .progress-knob {
+    opacity: 0 !important;
+}
+
+.player-container.idle .quality-dropdown,
+.player-container.idle .download-dropdown,
+.player-container.idle .audio-dropdown,
+.player-container.idle .speed-dropdown {
+    display: none !important;
+}
+
+/* Loading indicator */
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 99;
+    display: none;
+}
+
+.loading-indicator.show {
+    display: block;
+}
+
+/* Premium indicator */
+.premium-indicator {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #000;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 99;
+    display: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.premium-indicator.show {
+    display: block;
+    animation: fadeOut 3s forwards;
+}
+
+/* Error message */
+.error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: #ff5252;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 16px;
+    z-index: 99;
+    display: none;
+    text-align: center;
+    max-width: 80%;
+    border: 2px solid #ff5252;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.error-message button {
+    background: #ff5252;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Audio track indicator */
+.audio-track-indicator {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(59, 130, 246, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 99;
+    display: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.audio-track-indicator.show {
+    display: block;
+    animation: fadeOut 3s forwards;
+}
+
+/* Hide audio button when not needed */
+.audio-btn.hidden {
+    display: none !important;
+}
+
+/* Source type indicator */
+.source-type-indicator {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 99;
+    display: none;
+}
+
+.source-type-indicator.show {
+    display: block;
+    animation: fadeOut 3s forwards;
+}
+
+/* Seek time preview */
+.seek-time-preview {
+    position: absolute;
+    top: -35px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: none;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    z-index: 102;
+}
+
+/* Mobile specific styles */
+.mobile-seek-knob {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(229, 9, 20, 0.9);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 103;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    touch-action: none;
+}
+
+@media (max-width: 768px) {
+    .progress-knob {
+        width: 20px;
+        height: 20px;
+        right: -10px;
+    }
+    
+    .control-btn, .download-btn, .quality-btn, .fullscreen-btn, .speed-btn {
+        padding: 6px 8px;
+        min-height: 36px;
+        font-size: 12px;
+    }
+    
+    .audio-btn {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+}
+
+/* Audio flag icons */
+.audio-flag {
+    font-size: 16px;
+}
+
+
+
+/* ============================================ */
+/* LANDSCAPE FULLSCREEN FIX - MINIMAL CHANGES */
+/* ============================================ */
+
+/* 1. Landscape Mode Detection */
+@media (orientation: landscape) and (max-height: 600px) {
+    /* Player container adjust for landscape */
+    .custom-player-container {
+        padding-bottom: 0 !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+    }
+    
+    #customVideo {
+        object-fit: contain !important;
+        height: 100% !important;
+    }
+    
+    /* 2. Bottom controls - Existing size maintain */
+    .bottom-controls {
+        background: linear-gradient(to top, 
+            rgba(0, 0, 0, 0.85) 0%, 
+            rgba(0, 0, 0, 0.7) 50%, 
+            transparent 100%) !important;
+        padding: 10px 15px !important;
+        transition: all 0.5s ease !important;
+    }
+    
+    /* 3. Progress container - Existing size */
+    .progress-container {
+        margin-bottom: 10px !important;
+    }
+    
+    .progress-bar-bg {
+        height: 5px !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+    }
+    
+    .progress-bar {
+        height: 100% !important;
+        background: #e50914 !important;
+    }
+    
+    .progress-knob {
+        width: 16px !important;
+        height: 16px !important;
+        right: -8px !important;
+        background: #e50914 !important;
+        border: 2px solid white !important;
+        box-shadow: 0 0 8px rgba(229, 9, 20, 0.8) !important;
+        transition: opacity 0.3s ease !important;
+    }
+    
+    /* 4. Buttons - Existing size maintain */
+    .control-btn, 
+    .speed-btn, 
+    .quality-btn, 
+    .fullscreen-btn, 
+    .download-btn {
+        padding: 6px 10px !important;
+        min-height: 36px !important;
+        font-size: 14px !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* 5. Time display */
+    .time-display {
+        font-size: 13px !important;
+        margin-bottom: 6px !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    /* 6. Idle state - Fade out effect */
+    .player-container.idle .bottom-controls {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(10px) !important;
+    }
+    
+    .player-container.idle .progress-knob {
+        opacity: 0 !important;
+    }
+    
+    /* 7. Show state - Fade in effect */
+    .player-container:not(.idle) .bottom-controls {
+        opacity: 1 !important;
+        pointer-events: all !important;
+        transform: translateY(0) !important;
+    }
+    
+    /* 8. Transparent overlay shadow */
+    .player-container.idle::before {
+        content: '' !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 80px !important;
+        background: linear-gradient(to top, 
+            rgba(0, 0, 0, 0.4) 0%, 
+            rgba(0, 0, 0, 0.2) 30%, 
+            transparent 100%) !important;
+        z-index: 99 !important;
+        pointer-events: none !important;
+        transition: opacity 0.5s ease !important;
+    }
+    
+    .player-container:not(.idle)::before {
+        opacity: 0.3 !important;
+    }
+    
+    .player-container.idle::before {
+        opacity: 0.1 !important;
+    }
+}
+
+/* 9. Fullscreen mode special styling */
+.custom-player-container:fullscreen,
+.custom-player-container:-webkit-full-screen,
+.custom-player-container:-moz-full-screen,
+.custom-player-container:-ms-fullscreen {
+    background: #000 !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding-bottom: 0 !important;
+}
+
+/* 10. Hide browser's native controls in landscape fullscreen */
+@media (orientation: landscape) {
+    #customVideo::-webkit-media-controls {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-panel {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-play-button {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-timeline {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-current-time-display {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-time-remaining-display {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-mute-button {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-volume-slider {
+        display: none !important;
+    }
+    
+    #customVideo::-webkit-media-controls-fullscreen-button {
+        display: none !important;
+    }
+}
+
+/* 11. Mobile landscape touch area */
+@media (orientation: landscape) and (max-width: 900px) {
+    .custom-player-container {
+        touch-action: pan-y pinch-zoom !important;
+    }
+    
+    /* Touch to show controls */
+    .custom-player-container.touch-active .bottom-controls {
+        opacity: 1 !important;
+        pointer-events: all !important;
+        transition-duration: 0.2s !important;
+    }
+    
+    .custom-player-container.touch-active::before {
+        opacity: 0.4 !important;
+    }
+}
+
+
+/* ============================================ */
+/* DROPDOWN BUTTONS FIX WHEN VIDEO PAUSED */
+/* ============================================ */
+
+/* 1. When video is paused, dropdown buttons should work */
+.player-container video.paused ~ .bottom-controls,
+video[data-paused="true"] ~ .bottom-controls {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* 2. Make sure dropdown buttons are always clickable */
+.audio-btn, .quality-btn, .speed-btn, .download-btn {
+    pointer-events: auto !important;
+}
+
+/* 3. Dropdowns should be clickable when shown */
+.audio-dropdown.show,
+.quality-dropdown.show,
+.speed-dropdown.show,
+.download-dropdown.show {
+    display: block !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+/* 4. Fix for when controls are in idle state but video is paused */
+.player-container.idle video.paused ~ .bottom-controls {
+    opacity: 0.9 !important;
+    pointer-events: auto !important;
+}
+
+/* 5. Ensure all control buttons work in paused state */
+video.paused ~ .bottom-controls .control-btn,
+video.paused ~ .bottom-controls .audio-btn,
+video.paused ~ .bottom-controls .quality-btn,
+video.paused ~ .bottom-controls .speed-btn,
+video.paused ~ .bottom-controls .download-btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* =====================
+   Volume Control Visibility on Mobile
+   ===================== */
+
+/* Hide volume control by default on mobile portrait */
+@media (max-width: 768px) and (orientation: portrait) {
+    .volume-control {
+        display: none !important;
+    }
+}
+
+/* Show volume control on mobile landscape */
+@media (max-width: 768px) and (orientation: landscape) {
+    .volume-control {
+        display: flex !important;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Optional: make slider smaller in landscape for touch-friendliness */
+    .volume-slider {
+        width: 70px;
+    }
+}
+
+/* =====================
+   General Mobile Controls Layout
+   ===================== */
+@media (max-width: 768px) {
+    .bottom-controls {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 5px;
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .controls-row {
+        display: flex !important;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .left-controls, .right-controls {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .control-btn,
+    .audio-btn,
+    .speed-btn,
+    .download-btn,
+    .quality-btn,
+    .fullscreen-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        min-width: 36px;
+        min-height: 36px;
+        padding: 4px 6px;
+        margin: 0;
+    }
+
+    .fullscreen-btn {
+        order: 1;
+    }
+}
+
+
